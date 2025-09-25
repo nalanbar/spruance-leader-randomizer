@@ -165,7 +165,16 @@ function SpruanceLeaderRandomizer() {
   const checkIfSpecial = (campaign) => {
     const special = campaign['Special?'];
     if (special && special.toLowerCase() !== 'no' && special !== '') {
-      setStep('specialMessage');
+      // Generate special campaign task forces
+      if (campaign.Name === 'Escape and Evade') {
+        generateEscapeAndEvade(campaign);
+      } else if (campaign.Name === 'Falkland Islands War') {
+        generateFalklands(campaign);
+      } else if (campaign.Name === 'Destroy the Kirov') {
+        setStep('destroyKirovSetup');
+      } else {
+        setStep('specialMessage');
+      }
     } else {
       setStep('selectLength');
     }
@@ -241,6 +250,24 @@ function SpruanceLeaderRandomizer() {
     });
 
     const shipsPool = [...availableShips];
+    
+    // If flagship is selected, add it first and remove from pool
+    if (selectedFlagship && selectedFlagship !== '') {
+      const flagshipShip = shipsPool.find(ship => ship.sname === selectedFlagship);
+      if (flagshipShip) {
+        const flagshipCost = parseInt(flagshipShip.initialCost);
+        if (currentSOSpent + flagshipCost <= maxSO) {
+          currentSOSpent += flagshipCost;
+          selectedShips.push({
+            ...flagshipShip,
+            experienceLevel: 'Flagship'
+          });
+          // Remove flagship from pool so it's not selected again
+          const flagshipIndex = shipsPool.findIndex(s => s.sname === selectedFlagship);
+          shipsPool.splice(flagshipIndex, 1);
+        }
+      }
+    }
 
     experienceLevels.forEach(level => {
       const count = parseInt(selectedCampaign[level]) || 0;
@@ -293,6 +320,173 @@ function SpruanceLeaderRandomizer() {
     setStep('campaignSelection');
   };
 
+  const generateEscapeAndEvade = (campaign) => {
+    const requiredShips = [
+      'USS Mobile Bay CG-53',
+      'USS Paul Foster DD-964',
+      'USS Brewton FF-1086',
+      'USS Reuben James FFG-57',
+      'USS Knox FF-1052'
+    ];
+    
+    const selectedShips = requiredShips.map(shipName => {
+      const ship = ships.find(s => s.sname === shipName);
+      return {
+        ...ship,
+        experienceLevel: 'Assigned'
+      };
+    });
+    
+    // Add support ships
+    selectedShips.push({
+      sname: 'Troop Ship',
+      class: 'Support',
+      stype: 'Support',
+      country: 'USA',
+      initialCost: 0,
+      experienceLevel: 'Support'
+    });
+    selectedShips.push({
+      sname: 'Troop Ship',
+      class: 'Support',
+      stype: 'Support',
+      country: 'USA',
+      initialCost: 0,
+      experienceLevel: 'Support'
+    });
+    selectedShips.push({
+      sname: 'Cargo Ship',
+      class: 'Support',
+      stype: 'Support',
+      country: 'USA',
+      initialCost: 0,
+      experienceLevel: 'Support'
+    });
+    
+    const tfCommanders = commanders.filter(c => c.Type === 'Task Force Commander');
+    const randomCommander = tfCommanders[Math.floor(Math.random() * tfCommanders.length)];
+    
+    setTaskForce({
+      campaign: campaign.Name,
+      year: campaign.Year,
+      theater: campaign.Theater,
+      length: 'Special',
+      startingSO: 'N/A',
+      reserveSO: 0,
+      flagship: 'USS Mobile Bay CG-53',
+      commander: randomCommander,
+      ships: selectedShips
+    });
+    setStep('displayTaskForce');
+  };
+
+  const generateFalklands = (campaign) => {
+    const requiredShips = [
+      'HMS Sheffield D80',
+      'HMS Exeter D89',
+      'HMS Minerva F45',
+      'HMS. Argonaut F56',
+      'HMS Avenger F185',
+      'HMS Broadsword F88',
+      'HMS Glamorgan D19'
+    ];
+    
+    const selectedShips = requiredShips.map(shipName => {
+      const ship = ships.find(s => s.sname === shipName);
+      return {
+        ...ship,
+        experienceLevel: 'Assigned'
+      };
+    });
+    
+    const ukCommanders = commanders.filter(c => c.Name.includes('(UK)'));
+    const randomCommander = ukCommanders.length > 0 
+      ? ukCommanders[Math.floor(Math.random() * ukCommanders.length)]
+      : commanders.filter(c => c.Type === 'Task Force Commander')[0];
+    
+    // Determine campaign length
+    const length = campaign['Short Campaign'] ? 'Short' : 'Special';
+    const so = campaign['Short Campaign'] || 'N/A';
+    
+    setTaskForce({
+      campaign: campaign.Name,
+      year: campaign.Year,
+      theater: campaign.Theater,
+      length: length,
+      startingSO: so,
+      reserveSO: 0,
+      flagship: 'HMS Glamorgan D19',
+      commander: randomCommander,
+      ships: selectedShips
+    });
+    setStep('displayTaskForce');
+  };
+
+  const generateDestroyKirov = (useShortCampaign) => {
+    const availableFrigates = ships.filter(ship => {
+      const shipYear = parseInt(ship.year_from);
+      const campaignYear = parseInt(selectedCampaign.Year);
+      const theaterMatch = ship.theatre.toLowerCase() === 'both' || 
+                          ship.theatre.toLowerCase() === selectedCampaign.Theater.toLowerCase();
+      return shipYear <= campaignYear && theaterMatch && ship.stype === 'Frigate';
+    });
+    
+    const selectedShips = [];
+    
+    if (useShortCampaign) {
+      // Use campaign structure: 1 Newbie, 1 Green, 2 Average, 2 Skilled
+      const experienceLevels = ['Newbie', 'Green', 'Average', 'Average', 'Skilled', 'Skilled'];
+      const frigatePool = [...availableFrigates];
+      
+      experienceLevels.forEach(level => {
+        if (frigatePool.length > 0) {
+          const randomIndex = Math.floor(Math.random() * frigatePool.length);
+          const ship = frigatePool.splice(randomIndex, 1)[0];
+          selectedShips.push({
+            ...ship,
+            experienceLevel: level
+          });
+        }
+      });
+    } else {
+      // Random frigates
+      const frigatePool = [...availableFrigates];
+      const numShips = Math.floor(Math.random() * 4) + 4; // 4-7 frigates
+      
+      for (let i = 0; i < numShips && frigatePool.length > 0; i++) {
+        const randomIndex = Math.floor(Math.random() * frigatePool.length);
+        const ship = frigatePool.splice(randomIndex, 1)[0];
+        const experienceLevels = ['Newbie', 'Green', 'Average', 'Skilled'];
+        const randomExp = experienceLevels[Math.floor(Math.random() * experienceLevels.length)];
+        selectedShips.push({
+          ...ship,
+          experienceLevel: randomExp
+        });
+      }
+    }
+    
+    let commander;
+    if (selectedCommander) {
+      commander = commanders.find(c => c.Name === selectedCommander);
+    } else {
+      const tfCommanders = commanders.filter(c => c.Type === 'Task Force Commander');
+      commander = tfCommanders[Math.floor(Math.random() * tfCommanders.length)];
+    }
+    
+    setTaskForce({
+      campaign: selectedCampaign.Name,
+      year: selectedCampaign.Year,
+      theater: selectedCampaign.Theater,
+      length: useShortCampaign ? 'Short' : 'Random',
+      startingSO: useShortCampaign ? '100' : 'N/A',
+      reserveSO: 0,
+      flagship: 'None',
+      commander: commander,
+      ships: selectedShips
+    });
+    setStep('displayTaskForce');
+  };
+
   return React.createElement('div', { className: "min-h-screen bg-slate-900 text-slate-100 p-8" },
     React.createElement('div', { className: "max-w-4xl mx-auto" },
       React.createElement('h1', { className: "text-4xl font-bold mb-2 text-blue-400" }, 'Spruance Leader'),
@@ -327,6 +521,40 @@ function SpruanceLeaderRandomizer() {
                 React.createElement('span', { className: "text-amber-400 text-sm" }, 'Special')
             )
           )
+        )
+      ),
+
+      step === 'destroyKirovSetup' && selectedCampaign && React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-slate-700" },
+        React.createElement('h3', { className: "text-2xl font-semibold mb-2 text-blue-400" }, selectedCampaign.Name),
+        React.createElement('p', { className: "text-slate-300 mb-4" }, `Year: ${selectedCampaign.Year} | Theater: ${selectedCampaign.Theater}`),
+        React.createElement('p', { className: "text-amber-300 mb-4" }, 'This mission uses only frigates.'),
+        
+        React.createElement('div', { className: "space-y-4 mb-6" },
+          React.createElement('div', null,
+            React.createElement('label', { className: "block text-slate-300 mb-2" }, 'Select Commander (Optional):'),
+            React.createElement('select', {
+              value: selectedCommander,
+              onChange: (e) => setSelectedCommander(e.target.value),
+              className: "w-full bg-slate-700 border border-slate-600 rounded p-2 text-white"
+            },
+              React.createElement('option', { value: '' }, 'Random Commander'),
+              commanders.filter(c => c.Type === 'Task Force Commander').map((cmd, idx) => 
+                React.createElement('option', { key: idx, value: cmd.Name }, cmd.Name)
+              )
+            )
+          )
+        ),
+        
+        React.createElement('h4', { className: "text-lg font-semibold mb-3" }, 'Campaign Options:'),
+        React.createElement('div', { className: "space-y-3" },
+          React.createElement('button', {
+            onClick: () => generateDestroyKirov(true),
+            className: "w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition text-left"
+          }, 'Short Campaign - 100 SO Points'),
+          React.createElement('button', {
+            onClick: () => generateDestroyKirov(false),
+            className: "w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition text-left"
+          }, 'Random Task Force (Frigates Only)')
         )
       ),
 
