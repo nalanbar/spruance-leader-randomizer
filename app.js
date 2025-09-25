@@ -120,6 +120,8 @@ function SpruanceLeaderRandomizer() {
   const [step, setStep] = React.useState('campaignSelection');
   const [reserveSO, setReserveSO] = React.useState(0);
   const [reserveInput, setReserveInput] = React.useState('');
+  const [selectedFlagship, setSelectedFlagship] = React.useState('');
+  const [selectedCommander, setSelectedCommander] = React.useState('');
 
   const parseCSV = (text) => {
     const lines = text.trim().split('\n');
@@ -192,7 +194,17 @@ function SpruanceLeaderRandomizer() {
   const handleReserveDecision = (hasReserve) => {
     if (!hasReserve) {
       setReserveSO(0);
-      generateTaskForce(0);
+      
+      // Get selected commander or random if none selected
+      let commander;
+      if (selectedCommander) {
+        commander = commanders.find(c => c.Name === selectedCommander);
+      } else {
+        const tfCommanders = commanders.filter(c => c.Type === 'Task Force Commander');
+        commander = tfCommanders[Math.floor(Math.random() * tfCommanders.length)];
+      }
+      
+      generateTaskForce(0, commander);
     } else {
       // Stay on reserve page to get input
     }
@@ -201,10 +213,20 @@ function SpruanceLeaderRandomizer() {
   const handleReserveSubmit = () => {
     const reserve = parseInt(reserveInput) || 0;
     setReserveSO(reserve);
-    generateTaskForce(reserve);
+    
+    // Get selected commander or random if none selected
+    let commander;
+    if (selectedCommander) {
+      commander = commanders.find(c => c.Name === selectedCommander);
+    } else {
+      const tfCommanders = commanders.filter(c => c.Type === 'Task Force Commander');
+      commander = tfCommanders[Math.floor(Math.random() * tfCommanders.length)];
+    }
+    
+    generateTaskForce(reserve, commander);
   };
 
-  const generateTaskForce = (reserve) => {
+  const generateTaskForce = (reserve, commander) => {
     const maxSO = parseInt(campaignLength.so) - reserve;
     const experienceLevels = ['Newbie', 'Green', 'Average', 'Skilled', 'Ace', 'Warrior'];
     const selectedShips = [];
@@ -246,9 +268,6 @@ function SpruanceLeaderRandomizer() {
       }
     });
 
-    const tfCommanders = commanders.filter(c => c.Type === 'Task Force Commander');
-    const randomCommander = tfCommanders[Math.floor(Math.random() * tfCommanders.length)];
-
     setTaskForce({
       campaign: selectedCampaign.Name,
       year: selectedCampaign.Year,
@@ -256,7 +275,8 @@ function SpruanceLeaderRandomizer() {
       length: campaignLength.name,
       startingSO: campaignLength.so,
       reserveSO: reserve,
-      commander: randomCommander,
+      flagship: selectedFlagship || 'None',
+      commander: commander,
       ships: selectedShips
     });
     setStep('displayTaskForce');
@@ -268,6 +288,8 @@ function SpruanceLeaderRandomizer() {
     setTaskForce(null);
     setReserveSO(0);
     setReserveInput('');
+    setSelectedFlagship('');
+    setSelectedCommander('');
     setStep('campaignSelection');
   };
 
@@ -338,10 +360,50 @@ function SpruanceLeaderRandomizer() {
       ),
 
       step === 'reserveSO' && campaignLength && React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-slate-700" },
-        React.createElement('h3', { className: "text-xl font-semibold mb-4" }, 'Reserve SO Points'),
+        React.createElement('h3', { className: "text-xl font-semibold mb-4" }, 'Task Force Setup'),
         React.createElement('p', { className: "text-slate-300 mb-4" }, 
           `Campaign: ${selectedCampaign.Name} (${campaignLength.name}) - ${campaignLength.so} SO Points`
         ),
+        
+        React.createElement('div', { className: "space-y-4 mb-6" },
+          React.createElement('div', null,
+            React.createElement('label', { className: "block text-slate-300 mb-2" }, 'Select Flagship (Optional):'),
+            React.createElement('select', {
+              value: selectedFlagship,
+              onChange: (e) => setSelectedFlagship(e.target.value),
+              className: "w-full bg-slate-700 border border-slate-600 rounded p-2 text-white"
+            },
+              React.createElement('option', { value: '' }, 'No Flagship'),
+              ships.filter(ship => {
+                const shipYear = parseInt(ship.year_from);
+                const campaignYear = parseInt(selectedCampaign.Year);
+                const theaterMatch = ship.theatre.toLowerCase() === 'both' || 
+                                    ship.theatre.toLowerCase() === selectedCampaign.Theater.toLowerCase();
+                return shipYear <= campaignYear && theaterMatch && 
+                       (ship.tags.includes('Command Ship') || ship.stype === 'Cruiser' || ship.stype === 'Battleship');
+              }).map((ship, idx) => 
+                React.createElement('option', { key: idx, value: ship.sname }, 
+                  `${ship.sname} (${ship.class})`
+                )
+              )
+            )
+          ),
+          
+          React.createElement('div', null,
+            React.createElement('label', { className: "block text-slate-300 mb-2" }, 'Select Commander (Optional):'),
+            React.createElement('select', {
+              value: selectedCommander,
+              onChange: (e) => setSelectedCommander(e.target.value),
+              className: "w-full bg-slate-700 border border-slate-600 rounded p-2 text-white"
+            },
+              React.createElement('option', { value: '' }, 'Random Commander'),
+              commanders.filter(c => c.Type === 'Task Force Commander').map((cmd, idx) => 
+                React.createElement('option', { key: idx, value: cmd.Name }, cmd.Name)
+              )
+            )
+          )
+        ),
+        
         React.createElement('p', { className: "text-slate-300 mb-4" }, 
           'Would you like to set aside SO points for upgrades and ordnance?'
         ),
@@ -415,6 +477,10 @@ function SpruanceLeaderRandomizer() {
             React.createElement('div', null,
               React.createElement('p', { className: "text-slate-400" }, 'Commander:'),
               React.createElement('p', { className: "font-semibold" }, taskForce.commander.Name)
+            ),
+            React.createElement('div', null,
+              React.createElement('p', { className: "text-slate-400" }, 'Flagship:'),
+              React.createElement('p', { className: "font-semibold" }, taskForce.flagship)
             )
           ),
 
@@ -453,7 +519,10 @@ function SpruanceLeaderRandomizer() {
 
           React.createElement('div', { className: "mt-6 flex gap-4" },
             React.createElement('button', {
-              onClick: () => generateTaskForce(taskForce.reserveSO),
+              onClick: () => {
+                const commander = taskForce.commander;
+                generateTaskForce(taskForce.reserveSO, commander);
+              },
               className: "flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2"
             }, 'Regenerate Task Force'),
             React.createElement('button', {
