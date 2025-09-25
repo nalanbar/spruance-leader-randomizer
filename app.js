@@ -437,7 +437,7 @@ function SpruanceLeaderRandomizer() {
           React.createElement('div', { className: "mt-4 p-4 bg-slate-700 rounded-lg border-2 border-blue-500" },
             React.createElement('div', { className: "flex justify-between items-center" },
               React.createElement('div', null,
-                React.createElement('p', { className: "text-slate-400 text-sm" }, 'SO Points Used:'),
+                React.createElement('p', { className: "text-slate-400 text-sm" }, 'SO Points Used (Ships):'),
                 React.createElement('p', { className: "text-2xl font-bold text-blue-300" },
                   taskForce.ships.reduce((sum, ship) => sum + parseInt(ship.initialCost), 0)
                 )
@@ -445,7 +445,7 @@ function SpruanceLeaderRandomizer() {
               React.createElement('div', { className: "text-right" },
                 React.createElement('p', { className: "text-slate-400 text-sm" }, 'SO Points Remaining:'),
                 React.createElement('p', { className: "text-2xl font-bold text-green-400" },
-                  (parseInt(taskForce.startingSO) - taskForce.reserveSO) - taskForce.ships.reduce((sum, ship) => sum + parseInt(ship.initialCost), 0)
+                  parseInt(taskForce.startingSO) - taskForce.ships.reduce((sum, ship) => sum + parseInt(ship.initialCost), 0)
                 )
               )
             )
