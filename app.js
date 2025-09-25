@@ -117,8 +117,9 @@ function SpruanceLeaderRandomizer() {
   const [selectedCampaign, setSelectedCampaign] = React.useState(null);
   const [campaignLength, setCampaignLength] = React.useState(null);
   const [taskForce, setTaskForce] = React.useState(null);
-  const [step, setStep] = React.useState('campaignType');
-  const [isSpecialCampaign, setIsSpecialCampaign] = React.useState(false);
+  const [step, setStep] = React.useState('campaignSelection');
+  const [reserveSO, setReserveSO] = React.useState(0);
+  const [reserveInput, setReserveInput] = React.useState('');
 
   const parseCSV = (text) => {
     const lines = text.trim().split('\n');
@@ -139,24 +140,31 @@ function SpruanceLeaderRandomizer() {
     setCommanders(parseCSV(COMMANDERS_CSV));
   }, []);
 
-  const handleSpecialCampaignCheck = (value) => {
-    setIsSpecialCampaign(value);
-    if (value) {
-      setStep('specialMessage');
-    } else {
+  const handleCampaignChoice = (choice) => {
+    if (choice === 'random') {
       selectRandomCampaign();
+    } else {
+      setStep('pickCampaign');
     }
   };
 
   const selectRandomCampaign = () => {
     if (campaigns.length === 0) return;
-    const normalCampaigns = campaigns.filter(c => {
-      const special = c['Special?'];
-      return !special || special.toLowerCase() === 'no' || special === '';
-    });
-    if (normalCampaigns.length > 0) {
-      const randomCampaign = normalCampaigns[Math.floor(Math.random() * normalCampaigns.length)];
-      setSelectedCampaign(randomCampaign);
+    const randomCampaign = campaigns[Math.floor(Math.random() * campaigns.length)];
+    setSelectedCampaign(randomCampaign);
+    checkIfSpecial(randomCampaign);
+  };
+
+  const selectSpecificCampaign = (campaign) => {
+    setSelectedCampaign(campaign);
+    checkIfSpecial(campaign);
+  };
+
+  const checkIfSpecial = (campaign) => {
+    const special = campaign['Special?'];
+    if (special && special.toLowerCase() !== 'no' && special !== '') {
+      setStep('specialMessage');
+    } else {
       setStep('selectLength');
     }
   };
@@ -176,10 +184,28 @@ function SpruanceLeaderRandomizer() {
     return lengths;
   };
 
-  const generateTaskForce = (length) => {
+  const handleLengthSelection = (length) => {
     setCampaignLength(length);
-    
-    const maxSO = parseInt(length.so);
+    setStep('reserveSO');
+  };
+
+  const handleReserveDecision = (hasReserve) => {
+    if (!hasReserve) {
+      setReserveSO(0);
+      generateTaskForce(0);
+    } else {
+      // Stay on reserve page to get input
+    }
+  };
+
+  const handleReserveSubmit = () => {
+    const reserve = parseInt(reserveInput) || 0;
+    setReserveSO(reserve);
+    generateTaskForce(reserve);
+  };
+
+  const generateTaskForce = (reserve) => {
+    const maxSO = parseInt(campaignLength.so) - reserve;
     const experienceLevels = ['Newbie', 'Green', 'Average', 'Skilled', 'Ace', 'Warrior'];
     const selectedShips = [];
     let currentSOSpent = 0;
@@ -192,14 +218,12 @@ function SpruanceLeaderRandomizer() {
       return shipYear <= campaignYear && theaterMatch;
     });
 
-    // Create a copy for random selection
     const shipsPool = [...availableShips];
 
     experienceLevels.forEach(level => {
       const count = parseInt(selectedCampaign[level]) || 0;
       for (let i = 0; i < count; i++) {
         if (shipsPool.length > 0) {
-          // Filter ships that fit within budget
           const affordableShips = shipsPool.filter(ship => {
             const shipCost = parseInt(ship.initialCost);
             return currentSOSpent + shipCost <= maxSO;
@@ -209,7 +233,6 @@ function SpruanceLeaderRandomizer() {
             const randomIndex = Math.floor(Math.random() * affordableShips.length);
             const ship = affordableShips[randomIndex];
             
-            // Remove from main pool
             const poolIndex = shipsPool.findIndex(s => s === ship);
             shipsPool.splice(poolIndex, 1);
             
@@ -230,8 +253,9 @@ function SpruanceLeaderRandomizer() {
       campaign: selectedCampaign.Name,
       year: selectedCampaign.Year,
       theater: selectedCampaign.Theater,
-      length: length.name,
-      startingSO: length.so,
+      length: campaignLength.name,
+      startingSO: campaignLength.so,
+      reserveSO: reserve,
       commander: randomCommander,
       ships: selectedShips
     });
@@ -242,8 +266,9 @@ function SpruanceLeaderRandomizer() {
     setSelectedCampaign(null);
     setCampaignLength(null);
     setTaskForce(null);
-    setIsSpecialCampaign(false);
-    setStep('campaignType');
+    setReserveSO(0);
+    setReserveInput('');
+    setStep('campaignSelection');
   };
 
   return React.createElement('div', { className: "min-h-screen bg-slate-900 text-slate-100 p-8" },
@@ -251,33 +276,41 @@ function SpruanceLeaderRandomizer() {
       React.createElement('h1', { className: "text-4xl font-bold mb-2 text-blue-400" }, 'Spruance Leader'),
       React.createElement('h2', { className: "text-2xl mb-8 text-slate-300" }, 'Task Force Generator'),
 
-      step === 'campaignType' && React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-slate-700" },
-        React.createElement('h3', { className: "text-xl font-semibold mb-4" }, 'Campaign Type'),
-        React.createElement('p', { className: "mb-4 text-slate-300" }, 'Are you playing a special campaign?'),
-        
-        React.createElement('div', { className: "mb-4 p-4 bg-slate-700 rounded-lg" },
-          React.createElement('p', { className: "text-sm text-slate-400 mb-2" }, 'Special Campaigns:'),
-          React.createElement('ul', { className: "text-sm text-amber-300 space-y-1" },
-            React.createElement('li', null, '• Escape and Evade'),
-            React.createElement('li', null, '• Falkland Islands War'),
-            React.createElement('li', null, '• Destroy the Kirov')
-          )
-        ),
-
+      step === 'campaignSelection' && React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-slate-700" },
+        React.createElement('h3', { className: "text-xl font-semibold mb-4" }, 'Campaign Selection'),
+        React.createElement('p', { className: "mb-4 text-slate-300" }, 'Would you like to pick a campaign or randomly select one?'),
         React.createElement('div', { className: "space-x-4" },
           React.createElement('button', {
-            onClick: () => handleSpecialCampaignCheck(true),
-            className: "bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-8 rounded-lg transition"
-          }, 'Yes - Special Campaign'),
-          React.createElement('button', {
-            onClick: () => handleSpecialCampaignCheck(false),
+            onClick: () => handleCampaignChoice('pick'),
             className: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition"
-          }, 'No - Random Campaign')
+          }, 'Pick a Campaign'),
+          React.createElement('button', {
+            onClick: () => handleCampaignChoice('random'),
+            className: "bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition"
+          }, 'Random Campaign')
+        )
+      ),
+
+      step === 'pickCampaign' && React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-slate-700" },
+        React.createElement('h3', { className: "text-xl font-semibold mb-4" }, 'Select a Campaign'),
+        React.createElement('div', { className: "space-y-2" },
+          campaigns.map((campaign, idx) => 
+            React.createElement('button', {
+              key: idx,
+              onClick: () => selectSpecificCampaign(campaign),
+              className: "w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-lg transition text-left flex justify-between items-center"
+            },
+              React.createElement('span', null, campaign.Name),
+              (campaign['Special?'] && campaign['Special?'].toLowerCase() !== 'no' && campaign['Special?'] !== '') &&
+                React.createElement('span', { className: "text-amber-400 text-sm" }, 'Special')
+            )
+          )
         )
       ),
 
       step === 'specialMessage' && React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-amber-600" },
         React.createElement('h3', { className: "text-xl font-semibold mb-4 text-amber-400" }, 'Special Campaign Selected'),
+        React.createElement('p', { className: "text-lg font-semibold mb-2" }, selectedCampaign.Name),
         React.createElement('p', { className: "mb-6 text-slate-300" }, 'Please refer to the campaign card for specific instructions on ship selection and setup.'),
         React.createElement('button', {
           onClick: reset,
@@ -294,11 +327,53 @@ function SpruanceLeaderRandomizer() {
           getAvailableLengths().map(length =>
             React.createElement('button', {
               key: length.value,
-              onClick: () => generateTaskForce(length),
+              onClick: () => handleLengthSelection(length),
               className: "w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition text-left"
             },
               React.createElement('span', { className: "font-bold" }, `${length.name} Campaign`),
               React.createElement('span', { className: "float-right" }, `${length.so} SO Points`)
+            )
+          )
+        )
+      ),
+
+      step === 'reserveSO' && campaignLength && React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-slate-700" },
+        React.createElement('h3', { className: "text-xl font-semibold mb-4" }, 'Reserve SO Points'),
+        React.createElement('p', { className: "text-slate-300 mb-4" }, 
+          `Campaign: ${selectedCampaign.Name} (${campaignLength.name}) - ${campaignLength.so} SO Points`
+        ),
+        React.createElement('p', { className: "text-slate-300 mb-4" }, 
+          'Would you like to set aside SO points for upgrades and ordnance?'
+        ),
+        
+        React.createElement('div', { className: "space-y-4" },
+          React.createElement('div', { className: "space-x-4" },
+            React.createElement('button', {
+              onClick: () => handleReserveDecision(false),
+              className: "bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition"
+            }, 'No - Use All SO'),
+            React.createElement('button', {
+              onClick: () => handleReserveDecision(true),
+              className: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition"
+            }, 'Yes - Reserve SO')
+          ),
+          
+          reserveSO === 0 && React.createElement('div', { className: "mt-4" },
+            React.createElement('label', { className: "block text-slate-300 mb-2" }, 'Enter SO points to reserve:'),
+            React.createElement('div', { className: "flex gap-2" },
+              React.createElement('input', {
+                type: "number",
+                min: "0",
+                max: campaignLength.so,
+                value: reserveInput,
+                onChange: (e) => setReserveInput(e.target.value),
+                className: "flex-1 bg-slate-700 border border-slate-600 rounded p-2 text-white",
+                placeholder: "0"
+              }),
+              React.createElement('button', {
+                onClick: handleReserveSubmit,
+                className: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition"
+              }, 'Continue')
             )
           )
         )
@@ -326,8 +401,16 @@ function SpruanceLeaderRandomizer() {
               React.createElement('p', { className: "font-semibold" }, taskForce.theater)
             ),
             React.createElement('div', null,
-              React.createElement('p', { className: "text-slate-400" }, 'Starting SO:'),
+              React.createElement('p', { className: "text-slate-400" }, 'Total SO:'),
               React.createElement('p', { className: "font-semibold" }, taskForce.startingSO)
+            ),
+            React.createElement('div', null,
+              React.createElement('p', { className: "text-slate-400" }, 'Reserved SO:'),
+              React.createElement('p', { className: "font-semibold" }, taskForce.reserveSO)
+            ),
+            React.createElement('div', null,
+              React.createElement('p', { className: "text-slate-400" }, 'Available for Ships:'),
+              React.createElement('p', { className: "font-semibold" }, parseInt(taskForce.startingSO) - taskForce.reserveSO)
             ),
             React.createElement('div', null,
               React.createElement('p', { className: "text-slate-400" }, 'Commander:'),
@@ -362,7 +445,7 @@ function SpruanceLeaderRandomizer() {
               React.createElement('div', { className: "text-right" },
                 React.createElement('p', { className: "text-slate-400 text-sm" }, 'SO Points Remaining:'),
                 React.createElement('p', { className: "text-2xl font-bold text-green-400" },
-                  parseInt(taskForce.startingSO) - taskForce.ships.reduce((sum, ship) => sum + parseInt(ship.initialCost), 0)
+                  (parseInt(taskForce.startingSO) - taskForce.reserveSO) - taskForce.ships.reduce((sum, ship) => sum + parseInt(ship.initialCost), 0)
                 )
               )
             )
@@ -370,7 +453,7 @@ function SpruanceLeaderRandomizer() {
 
           React.createElement('div', { className: "mt-6 flex gap-4" },
             React.createElement('button', {
-              onClick: () => generateTaskForce(campaignLength),
+              onClick: () => generateTaskForce(taskForce.reserveSO),
               className: "flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2"
             }, 'Regenerate Task Force'),
             React.createElement('button', {
