@@ -673,6 +673,14 @@ function SpruanceLeaderRandomizer() {
         React.createElement('div', { className: "bg-slate-800 p-6 rounded-lg border border-blue-600" },
           React.createElement('h3', { className: "text-2xl font-semibold mb-4 text-blue-400" }, 'Task Force Generated'),
           
+          // Special campaign warning
+          (taskForce.campaign === 'Escape and Evade' || taskForce.campaign === 'Falkland Islands War' || taskForce.campaign === 'Destroy the Kirov') &&
+            React.createElement('div', { className: "mb-4 p-4 bg-amber-900 bg-opacity-30 border border-amber-600 rounded-lg" },
+              React.createElement('p', { className: "text-amber-400 text-sm" }, 
+                '⚠️ Please be sure to read the campaign card for this! The rules are not straightforward to program, and I may have gotten it wrong!'
+              )
+            ),
+          
           React.createElement('div', { className: "grid grid-cols-2 gap-4 mb-6" },
             React.createElement('div', null,
               React.createElement('p', { className: "text-slate-400" }, 'Campaign:'),
