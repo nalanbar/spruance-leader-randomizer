@@ -383,7 +383,7 @@ function SpruanceLeaderRandomizer() {
                        (ship.tags.includes('Command Ship') || ship.stype === 'Cruiser' || ship.stype === 'Battleship');
               }).map((ship, idx) => 
                 React.createElement('option', { key: idx, value: ship.sname }, 
-                  `${ship.sname} (${ship.class})`
+                  `${ship.stype} - ${ship.sname} (${ship.class})`
                 )
               )
             )
