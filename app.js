@@ -1,3 +1,4 @@
+//Just adding a character or two to fix a commit issue. 
 const campaignsData = [
   { name: "Holding the Line", year: "1942", short: 30, medium: 33, long: 39 },
   { name: "Against the Sun", year: "1942", short: 32, medium: 35, long: 40 },
