@@ -1,0 +1,82 @@
+country,stype,sname,class,year_from,theatre,tags,initialCost
+USA,Destroyer,USS John Rodgers DD-983,Spruance,1979,Atlantic,Helicopter SH-3 | TLAM | TA,20
+USA,Frigate,USS Knox FF-1052,Knox,1969,Pacific,Helicopter SH-2 | TA,10
+USA,Frigate,USS Rentz FFG-46,Oliver Hazard Perry,1984,Pacific,Helicopter SH-2 | TA,8
+USA,Frigate,USS Curts FFG-38,Oliver Hazard Perry,1983,Pacific,Helicopter SH-2 | TA,8
+USA,Frigate,USS Cook FF-1083,Knox,1971,Pacific,Helicopter SH-2 | TA,10
+USA,Frigate,USS Crommelin FFG-37,Oliver Hazard Perry,1983,Pacific,Helicopter SH-2 | TA,8
+USA,Destroyer,USS Scott DDG-995,Kidd,1981,Atlantic,Helicopter SH-2F,16
+USA,Destroyer,USS Mahan DDG-42,Farragut,1960,Atlantic,,12
+USA,Destroyer,USS Dewey DDG-45,Farragut,1959,Atlantic,,12
+USA,Destroyer,USS Richard E. Byrd DDG-23,Charles F. Adams,1964,Atlantic,,12
+USA,Destroyer,USS Spruance DD-963,Spruance,1975,Atlantic,,20
+USA,Frigate,USS Reuben James FFG-57,Oliver Hazard Perry,1986,Pacific,,8
+USA,Frigate,USS Kirk FF-1087,Knox,1972,Pacific,Helicopter SH-2 | TA,10
+USA,Frigate,USS Barbey FF-1088,Knox,1972,Pacific,Helicopter SH-2 | TA,10
+USA,Frigate,USS O’Callahan FF-1051,Garcia,1968,Pacific,Helicopter SH-2,6
+USA,Frigate,USS Brewton FF-1086,Knox,1972,Pacific,Helicopter SH-2 | TA,10
+USA,Cruiser,USS Bunker Hill CG-52,Ticonderoga,1986,Pacific,Helicopter SH-60B | TLAM(VLS) | TA | Missile Shield,26
+USA,Cruiser,USS Antietam CG-54,Ticonderoga,1987,Pacific,Helicopter SH-60B | TLAM(VLS) | TA | Missile Shield,26
+USA,Cruiser,USS Mobile Bay CG-53,Ticonderoga,1987,Pacific,Helicopter SH-60B | TLAM(VLS) | TA | Missile Shield,26
+USA,Cruiser,USS Halsey CG-23,Leahy,1963,Pacific,,16
+USA,Cruiser,USS Texas CGN-39,Virginia,1977,Pacific,TLAM,20
+USA,Cruiser,USS Sterett CG-31,Belknap,1967,Pacific,Command Ship | Helicopter SH-2,18
+USA,Battleship,USS Missouri BB-63,Iowa,1986,Pacific,Command Ship | Helicopter | RQ-2 | TLAM,20
+USA,Battleship,USS Iowa BB-61,Iowa,1984,Atlantic,Command Ship | Helicopter | RQ-2 | TLAM,20
+USA,Cruiser,USS Gridley CG-21,Leahy,1963,Atlantic,,16
+USA,Cruiser,USS Ticonderoga CG-47,Ticonderoga,1983,Atlantic,Helicopter SH-60B | TA | Missile Shield,22
+USA,Cruiser,USS Wainwright CG-28,Belknap,1966,Atlantic,Command Ship | Helicopter SH-2,18
+USA,Cruiser,USS Leyte Gulf CG-55,Ticonderoga,1987,Atlantic,Helicopter SH-60B | TLAM(VLS) | TA | Missile Shield,26
+USA,Cruiser,USS Virginia CGN-38,Virginia,1976,Atlantic,TLAM,20
+USA,Destroyer,USS Waddell DDG-24,Charles F. Adams,1964,Pacific,,12
+USA,Destroyer,USS Cochrane DDG-21,Charles F. Adams,1964,Pacific,,12
+USA,Destroyer,USS Paul Foster DD-964,Spruance,1976,Pacific,Helicopter SH-3 | TLAM | TA,20
+USA,Destroyer,USS Fletcher DD-992,Spruance,1980,Pacific,Helicopter SH-3 | TLAM | TA,20
+USA,Destroyer,USS Callaghan DDG-994,Kidd,1980,Pacific,Helicopter SH-2F,16
+USA,Destroyer,USS Cushing DD-985,Spruance,1979,Pacific,Helicopter SH-3 | TLAM | TA,20
+USA,Destroyer,USS Preble DDG-46,Farragut,1960,Pacific,,12
+USA,Frigate,USS Pharris FF-1094,Knox,1974,Atlantic,Helicopter SH-2,10
+USA,Frigate,USS Truett FF-1095,Knox,1974,Atlantic,Helicopter SH-2 | TA,10
+USA,Frigate,USS Valdez FF-1096,Knox,1974,Atlantic,Helicopter SH-2 | TA,10
+USA,Frigate,USS Voge FF-1047,Garcia,1966,Atlantic,Helicopter SH-2,6
+USA,Frigate,USS De Wert FFG-45,Oliver Hazard Perry,1983,Atlantic,Helicopter SH-2 | TA,8
+USA,Frigate,USS Doyle FFG-39,Oliver Hazard Perry,1983,Atlantic,Helicopter SH-2 | TA,8
+USA,Frigate,USS Underwood FFG-36,Oliver Hazard Perry,1983,Atlantic,Helicopter SH-2 | TA,8
+UK,Frigate,HMS Minerva F45,Leander,1979,Atlantic,Helicopter Lynx MK2,10
+UK,Frigate,HMS. Argonaut F56,Leander,1980,Atlantic,Helicopter Lynx MK2 | TA,12
+UK,Frigate,HMS Avenger F185,Type 21,1978,Atlantic,Helicopter Lynx MK2 | TA,10
+UK,Frigate,HMS Broadsword F88,Type 22,1979,Atlantic,Helicopter Lynx MK2,10
+UK,Destroyer,HMS Glamorgan D19,County,1956,Atlantic,Helicopter | HAS MK3,16
+UK,Destroyer,HMS Exeter D89,Type 42,1980,Atlantic,Helicopter Lynx MK2,14
+UK,Destroyer,HMS Sheffield D80,Type 42,1971,Atlantic,Helicopter Lynx MK2,14
+Australia,Submarine,HMAS Otama S62SSK,Oberon,1978,Pacific,,36
+UK,Submarine,HMS Trafalgar S 107 SSN,Trafalgar,1983,Atlantic,TLAM | Mine | TA,40
+France,Cruiser,FMS Colbert C611,Colbert,1959,Atlantic,Helicopter SA 321G,14
+France,Frigate,FMS Dupleix D641,Type C 70,1981,Atlantic,Helicopter MK.2 | TA,12
+France,Frigate,FMS Jean De Vienne D643,Type C 70,1984,Atlantic,Helicopter MK.2 | TA,12
+France,Frigate,FMS Drogou F 783,Type A 69,1976,Atlantic,,8
+France,Frigate,FMS Duquesne D603,Suffren,1970,Atlantic,TA,12
+Italy,Frigate,Grecale F-571,Maestrale,1983,Atlantic,Helicopter AB-212 | TA,12
+Italy,Frigate,Lupo F564,Lupo,1977,Atlantic,Helicopter AB-212,10
+Italy,Frigate,Aliseo F574,Maestrale,1983,Atlantic,Helicopter AB-212 | TA,12
+Italy,Cruiser,Andrea Doria C553,Andrea Doria,1864,Atlantic,Helicopter AB-212 (2),14
+Canada,Destroyer,HMCS Huron DDG281,Iroquois,1972,Atlantic,Helicopter CH-124 | TA,12
+Canada,Frigate,HMCS Nipigon F266,Annapolis,1964,Atlantic,Helicopter CH-124 | TA,8
+Canada,Frigate,HMCS Yukon DDG263,Mackenzie,1963,Atlantic,TA,8
+Canada,Destroyer,HMCS Iroquois DDG280,Iroquois,1972,Atlantic,Helicopter CH-124 | TA,12
+Australia,Destroyer,HMAS Perth D38,Perth,1965,Pacific,,12
+Australia,Frigate,HMAS Adelaide FFG01,Adelaide,1980,Pacific,SH-60,10
+Australia,Frigate,HMAS Torrens DE53,River,1971,Pacific,,8
+Australia,Frigate,HMAS Canberra FFG02,Adelaide,1981,Pacific,SH-60,10
+Australia,Destroyer,HMAS Brisbane D41,Perth,1967,Pacific,,12
+Spain,Frigate,Santa Maria F81,Santa Maria,1986,Atlantic,Helicopter S-70B | TA,10
+Germany,Destroyer,Lutiens D-185,Lutiens,1969,Atlantic,,12
+Germany,Frigate,Karlsruhe F212,Type 122,1984,Atlantic,Helicopter WG13,10
+Germany,Frigate,Bremen F207,Type 122,1982,Atlantic,Helicopter WG13,10
+Germany,Destroyer,Hamburg D181,Type 101A,1982,Atlantic,,12
+Germany,Destroyer,Rommel D187,Lutjens,1970,Atlantic,,12
+Japan,Submarine,JDS Mochishio SS574 SSK,Yuushio,1981,Pacific,Mine | TA,36
+,Destroyer,Hatakaze DD171,Hatakaze,1986,Pacific,,14
+,Frigate,Chitose DE220,Chikugo,1973,Pacific,,8
+,Frigate,Yubari DE227,Yubari,1983,Pacific,,10
+,Destroyer,Asagiri DD151,Asagiri,1988,Pacific,,12
